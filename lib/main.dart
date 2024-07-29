@@ -1,83 +1,74 @@
+import 'package:demo/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(ChangeNotifierProvider(
-      create: (_) => MySetting(),
-      child: MaterialApp(
-        home: MyApp(),
-      ),
-    ));
+import 'models/counter.dart';
+
+void main() {
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => MySettings()),
+      ChangeNotifierProvider(create: (_) => Counter())
+    ],
+    child: MyApp(),
+  ));
+}
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Consumer<MySetting>(builder: (context, mySettings, child) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: mySettings.color,
-          title: Text("Provider demo"),
-        ),
-        drawer: Drawer(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                    onPressed: () {
-                      mySettings.changeText();
-                      Navigator.pop(context);
-                    },
-                    child: Text('Change text')),
-                ElevatedButton(
-                    onPressed: () {
-                      mySettings.changeColor();
-                      Navigator.pop(context);
-                    },
-                    child: Text('Change color')),
-              ],
-            ),
-          ),
-        ),
-        body: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    mySettings.changeText();
-                  },
-                  child: Text('Change text')),
-              Text(mySettings.text)
-            ],
-          ),
-        ),
-      );
-    });
+    return MaterialApp(
+      title: 'Flutter Calculator',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: context.watch<MySettings>().isDark
+            ? Brightness.dark
+            : Brightness.light,
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(),
+    );
   }
 }
 
-class MySetting extends ChangeNotifier {
-  String text = 'Done';
-  Color color = Colors.red;
+class MyHomePage extends StatelessWidget {
+  MyHomePage({Key? key}) : super(key: key);
 
-  void changeText() {
-    if (text == 'Hello') {
-      text = 'World';
-    } else {
-      text = 'Hello';
-    }
-    notifyListeners();
-  }
-
-  void changeColor() {
-    if (color == Colors.red) {
-      color = Colors.green;
-    } else {
-      color = Colors.red;
-    }
-    notifyListeners();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter Provider'),
+        actions: [
+          Switch(
+              value: context.watch<MySettings>().isDark,
+              onChanged: (newValue) {
+                // context.read<MySettings>().setBrightness(newValue);
+                Provider.of<MySettings>(context, listen: false)
+                    .setBrightness(newValue);
+              })
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              context.watch<Counter>().myCounter.toString(),
+              style: Theme.of(context).textTheme.headline4,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          context.read<Counter>().add();
+        },
+      ),
+    );
   }
 }
