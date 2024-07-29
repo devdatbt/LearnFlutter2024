@@ -2,6 +2,11 @@
 
 A new Flutter project.
 
+## State management
+# Provider
+
+<img width="906" alt="image" src="https://github.com/user-attachments/assets/af6d4e57-bd5e-4f66-8c13-6eee21810509">
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
